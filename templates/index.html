@@ -5,29 +5,61 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        h3 {
+            margin-bottom: 25px;
+            color: #34495e;
+            font-weight: 500;
         }
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
         }
         textarea {
             width: 100%;
-            height: 100px;
+            height: 120px;
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
         }
         .tab-container {
-            margin-top: 20px;
+            margin-top: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .tab-buttons {
-            margin-bottom: 10px;
+            margin-bottom: 0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
         }
         .tab-button {
-            padding: 10px 20px;
-            background-color: #f0f0f0;
+            padding: 12px 24px;
+            background-color: #f8f9fa;
             border: none;
             cursor: pointer;
-            margin-right: 5px;
+            margin-right: 0;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            background-color: #e9ecef;
         }
         .tab-button.active {
             background-color: #4CAF50;
@@ -35,115 +67,384 @@
         }
         .tab-content {
             display: none;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 25px;
         }
         .tab-content.active {
             display: block;
         }
         #result {
             white-space: pre-wrap;
-            background-color: #f5f5f5;
-            padding: 10px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
         }
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
             margin-right: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
         button:hover {
             background-color: #45a049;
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
         }
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 10px;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #eee;
         }
         th {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
         }
         .link-cell a {
             color: #4CAF50;
             text-decoration: none;
+            font-weight: 500;
         }
         .link-cell a:hover {
             text-decoration: underline;
         }
+        .column-selection {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .column-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .column-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .column-option:hover {
+            background-color: #e9ecef;
+        }
+        .column-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .usage-guide {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .usage-guide h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+        .usage-guide ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .usage-guide li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: #555;
+        }
+        .loading-container {
+            display: none;
+            margin: 25px 0;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.3s ease-in-out;
+        }
+        .loading-text {
+            text-align: center;
+            margin: 10px 0;
+            color: #666;
+            font-weight: 500;
+        }
+        .time-estimate {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        .loading-details {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 6px;
+            font-size: 0.9em;
+            border: 1px solid #eee;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 25px 0;
+        }
+        .fuzzy-match {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
-    <h1>Token ID Generator</h1>
-    
-    <div class="input-group">
-        <label for="target_symbols">Target Symbols (comma-separated):</label><br>
-        <textarea id="target_symbols" placeholder="Enter symbols, e.g.: BTC,ETH,USDT"></textarea>
+    <h1>CoinGecko ID Finder</h1>
+    <h3>Find the CoinGecko ID for any crypto given the ticker.</h3>
+
+    <div class="usage-guide">
+        <h2>How to Use</h2>
+        <ul>
+            <li><strong>Enter Tickers:</strong> Input your crypto tickers (e.g., BTC, ETH, USDT) separated by commas</li>
+            <li><strong>Generate IDs:</strong> Click the "Generate IDs" button to fetch CoinGecko IDs</li>
+            <li><strong>View Results:</strong> Results appear in both table and JSON format - switch between views using the tabs</li>
+            <li><strong>Export Data:</strong> Select which columns you want to include, then either copy to clipboard or download as CSV</li>
+        </ul>
     </div>
 
     <div class="input-group">
-        <label for="manual_overrides">Manual Overrides (format: symbol:token_id, comma-separated):</label><br>
-        <textarea id="manual_overrides" placeholder="Enter overrides, e.g.: BTC:1234,ETH:5678"></textarea>
+        <textarea id="target_tickers" placeholder="Enter tickers, e.g.: BTC,ETH,USDT"></textarea>
     </div>
 
-    <button onclick="generateTokens()">Generate Token IDs</button>
-    <button onclick="copyResult()">Copy Results</button>
-    <button onclick="downloadCSV()">Download CSV</button>
+    <label>Select columns to display (also used for copy/CSV export):</label>
+    <div class="column-options">
+        <label class="column-option">
+            <input type="checkbox" id="show_ticker" checked> Ticker
+        </label>
+        <label class="column-option">
+            <input type="checkbox" id="show_id" checked> Token ID
+        </label>
+        <label class="column-option">
+            <input type="checkbox" id="show_link"> Link
+        </label>
+        <label class="column-option">
+            <input type="checkbox" id="show_match_type"> Match Type
+        </label>
+    </div>
+
+    <div>
+        <button onclick="generateTokens()" id="generateButton">Generate IDs</button>
+    </div>
+
+    <div>
+        <hr>
+    </div>
+
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-text">Processing your request...</div>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        <div class="time-estimate" id="timeEstimate">Estimated time remaining: Calculating...</div>
+        <div class="loading-details" id="loadingDetails">
+            <div>Step: <span id="currentStep">Initializing...</span></div>
+            <div>Progress: <span id="progressText">0%</span></div>
+        </div>
+    </div>
 
     <div class="tab-container">
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab(event, 'json')">JSON View</button>
-            <button class="tab-button" onclick="openTab(event, 'table')">Table View</button>
+            <button class="tab-button active" onclick="openTab(event, 'table')">Table View</button>
+            <button class="tab-button" onclick="openTab(event, 'json')">JSON View</button>
         </div>
 
-        <div id="json" class="tab-content active">
-            <div id="result"></div>
-        </div>
-
-        <div id="table" class="tab-content">
+        <div id="table" class="tab-content active">
             <table id="resultTable">
                 <thead>
                     <tr>
-                        <th>Symbol</th>
+                        <th>Ticker</th>
                         <th>Token ID</th>
                         <th>Link</th>
+                        <th>Match Type</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
+
+        <div id="json" class="tab-content">
+            <div id="result"></div>
+        </div>
     </div>
+
+    <div>
+        <hr>
+    </div>
+
+    <div class="column-selection">
+        <div class="action-buttons">
+            <button onclick="copyResult()">Copy To Clipboard</button>
+            <button onclick="downloadCSV()">Download CSV</button>
+        </div>
+    </div>
+
+    <footer>
+        Not affiliated with CoinGecko. Built this search engine because their ID naming logic is sh*t.
+    </footer>
 
     <script>
         let currentData = null;
+        let startTime = null;
+        let progressInterval = null;
+
+        function updateProgress(progress, step, timeRemaining) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const currentStep = document.getElementById('currentStep');
+            const timeEstimate = document.getElementById('timeEstimate');
+            
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+            currentStep.textContent = step;
+            
+            if (timeRemaining) {
+                timeEstimate.textContent = `Estimated time remaining: ${timeRemaining}`;
+            }
+        }
+
+        function startLoading() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const generateButton = document.getElementById('generateButton');
+            
+            loadingContainer.style.display = 'block';
+            generateButton.disabled = true;
+            startTime = Date.now();
+            
+            // Start with 0% progress
+            updateProgress(0, 'Initializing...', 'Calculating...');
+            
+            // Simulate progress updates
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                if (progress < 90) { // Only go up to 90% until we get real data
+                    progress += 0.5;
+                    updateProgress(progress, 'Processing...', 'Calculating...');
+                }
+            }, 1000);
+        }
+
+        function stopLoading() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const generateButton = document.getElementById('generateButton');
+            
+            clearInterval(progressInterval);
+            loadingContainer.style.display = 'none';
+            generateButton.disabled = false;
+        }
+
+        // Collapsible functionality
+        var coll = document.getElementsByClassName("collapsible");
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.classList.remove("active");
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    content.classList.add("active");
+                }
+            });
+        }
 
         async function generateTokens() {
-            const targetSymbols = document.getElementById('target_symbols').value;
-            const manualOverrides = document.getElementById('manual_overrides').value;
+            const targetTickers = document.getElementById('target_tickers').value;
 
-            const response = await fetch('/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    target_symbols: targetSymbols,
-                    manual_overrides: manualOverrides
-                })
-            });
+            startLoading();
 
-            currentData = await response.json();
-            updateDisplay(currentData);
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        target_tickers: targetTickers
+                    })
+                });
+
+                currentData = await response.json();
+                updateDisplay(currentData);
+                updateProgress(100, 'Complete!', '');
+                
+                // Wait a moment to show 100% before hiding
+                setTimeout(stopLoading, 500);
+            } catch (error) {
+                console.error('Error:', error);
+                updateProgress(0, 'Error occurred', '');
+                setTimeout(stopLoading, 2000);
+            }
         }
 
         function updateDisplay(data) {
@@ -154,15 +455,47 @@
             // Update table view
             const tbody = document.querySelector('#resultTable tbody');
             tbody.innerHTML = '';
+            
+            // Get selected columns
+            const showTicker = document.getElementById('show_ticker').checked;
+            const showId = document.getElementById('show_id').checked;
+            const showLink = document.getElementById('show_link').checked;
+            const showMatchType = document.getElementById('show_match_type').checked;
+            
+            // Update table headers
+            const thead = document.querySelector('#resultTable thead tr');
+            thead.innerHTML = '';
+            if (showTicker) thead.appendChild(createHeader('Ticker'));
+            if (showId) thead.appendChild(createHeader('Token ID'));
+            if (showLink) thead.appendChild(createHeader('Link'));
+            if (showMatchType) thead.appendChild(createHeader('Match Type'));
+            
+            // Update table rows
             data.forEach(item => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.symbol}</td>
-                    <td>${item.token_id}</td>
-                    <td class="link-cell">${item.link ? `<a href="${item.link}" target="_blank">View on CoinGecko</a>` : ''}</td>
-                `;
+                const matchType = item.fuzzy_match ? 
+                    `<span class="fuzzy-match">Fuzzy match: ${item.matched_ticker}</span>` : 
+                    'Exact match';
+                
+                if (showTicker) row.appendChild(createCell(item.ticker));
+                if (showId) row.appendChild(createCell(item.token_id));
+                if (showLink) row.appendChild(createCell(item.link ? `<a href="${item.link}" target="_blank">View on CoinGecko</a>` : ''));
+                if (showMatchType) row.appendChild(createCell(matchType));
+                
                 tbody.appendChild(row);
             });
+        }
+
+        function createHeader(text) {
+            const th = document.createElement('th');
+            th.textContent = text;
+            return th;
+        }
+
+        function createCell(content) {
+            const td = document.createElement('td');
+            td.innerHTML = content;
+            return td;
         }
 
         function openTab(evt, tabName) {
@@ -181,7 +514,23 @@
         }
 
         function copyResult() {
-            const resultText = document.getElementById('result').textContent;
+            const showTicker = document.getElementById('show_ticker').checked;
+            const showId = document.getElementById('show_id').checked;
+            const showLink = document.getElementById('show_link').checked;
+            const showMatchType = document.getElementById('show_match_type').checked;
+            
+            let resultText = '';
+            if (currentData) {
+                resultText = currentData.map(item => {
+                    const parts = [];
+                    if (showTicker) parts.push(item.ticker);
+                    if (showId) parts.push(item.token_id);
+                    if (showLink) parts.push(item.link || '');
+                    if (showMatchType) parts.push(item.fuzzy_match ? `Fuzzy match: ${item.matched_ticker}` : 'Exact match');
+                    return parts.join('\t');
+                }).join('\n');
+            }
+            
             navigator.clipboard.writeText(resultText)
                 .then(() => alert('Results copied to clipboard!'))
                 .catch(err => console.error('Failed to copy: ', err));
@@ -190,14 +539,27 @@
         function downloadCSV() {
             if (!currentData) return;
 
-            const headers = ['Symbol', 'Token ID', 'Link'];
+            const showTicker = document.getElementById('show_ticker').checked;
+            const showId = document.getElementById('show_id').checked;
+            const showLink = document.getElementById('show_link').checked;
+            const showMatchType = document.getElementById('show_match_type').checked;
+            
+            const headers = [];
+            if (showTicker) headers.push('Ticker');
+            if (showId) headers.push('Token ID');
+            if (showLink) headers.push('Link');
+            if (showMatchType) headers.push('Match Type');
+            
             const csvContent = [
                 headers.join(','),
-                ...currentData.map(item => [
-                    item.symbol,
-                    item.token_id,
-                    item.link
-                ].join(','))
+                ...currentData.map(item => {
+                    const parts = [];
+                    if (showTicker) parts.push(item.ticker);
+                    if (showId) parts.push(item.token_id);
+                    if (showLink) parts.push(item.link || '');
+                    if (showMatchType) parts.push(item.fuzzy_match ? `Fuzzy match: ${item.matched_ticker}` : 'Exact match');
+                    return parts.join(',');
+                })
             ].join('\n');
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
