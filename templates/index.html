@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token ID Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
+        .tab-container {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            margin-bottom: 10px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .tab-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #result {
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .link-cell a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .link-cell a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Token ID Generator</h1>
+    
+    <div class="input-group">
+        <label for="target_symbols">Target Symbols (comma-separated):</label><br>
+        <textarea id="target_symbols" placeholder="Enter symbols, e.g.: BTC,ETH,USDT"></textarea>
+    </div>
+
+    <div class="input-group">
+        <label for="manual_overrides">Manual Overrides (format: symbol:token_id, comma-separated):</label><br>
+        <textarea id="manual_overrides" placeholder="Enter overrides, e.g.: BTC:1234,ETH:5678"></textarea>
+    </div>
+
+    <button onclick="generateTokens()">Generate Token IDs</button>
+    <button onclick="copyResult()">Copy Results</button>
+    <button onclick="downloadCSV()">Download CSV</button>
+
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab(event, 'json')">JSON View</button>
+            <button class="tab-button" onclick="openTab(event, 'table')">Table View</button>
+        </div>
+
+        <div id="json" class="tab-content active">
+            <div id="result"></div>
+        </div>
+
+        <div id="table" class="tab-content">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Token ID</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentData = null;
+
+        async function generateTokens() {
+            const targetSymbols = document.getElementById('target_symbols').value;
+            const manualOverrides = document.getElementById('manual_overrides').value;
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    target_symbols: targetSymbols,
+                    manual_overrides: manualOverrides
+                })
+            });
+
+            currentData = await response.json();
+            updateDisplay(currentData);
+        }
+
+        function updateDisplay(data) {
+            // Update JSON view
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = JSON.stringify(data, null, 2);
+
+            // Update table view
+            const tbody = document.querySelector('#resultTable tbody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.symbol}</td>
+                    <td>${item.token_id}</td>
+                    <td class="link-cell">${item.link ? `<a href="${item.link}" target="_blank">View on CoinGecko</a>` : ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let content of tabContents) {
+                content.classList.remove('active');
+            }
+
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let button of tabButtons) {
+                button.classList.remove('active');
+            }
+
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        function copyResult() {
+            const resultText = document.getElementById('result').textContent;
+            navigator.clipboard.writeText(resultText)
+                .then(() => alert('Results copied to clipboard!'))
+                .catch(err => console.error('Failed to copy: ', err));
+        }
+
+        function downloadCSV() {
+            if (!currentData) return;
+
+            const headers = ['Symbol', 'Token ID', 'Link'];
+            const csvContent = [
+                headers.join(','),
+                ...currentData.map(item => [
+                    item.symbol,
+                    item.token_id,
+                    item.link
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'coingecko_ids.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html> 
